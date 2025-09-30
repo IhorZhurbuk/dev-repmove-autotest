@@ -1,5 +1,5 @@
 {
-  "BaseUrl": "https://dev-repmove-enterprise.web",
+  "BaseUrl": "https://dev-repmove-enterprise.web.app",
   "User": {
     "Email": "auto+test@gmail.com",
     "MainPassword": "Autotestpass1!",
