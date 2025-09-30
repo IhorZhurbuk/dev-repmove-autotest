@@ -11,7 +11,7 @@ namespace dev_repmove_autotest.Factories
             EBrowserType browserType,
             bool headless = true)
         {
-
+/*
             var args = new List<string>
         {
             "--window-size=1920,1080"
@@ -21,12 +21,11 @@ namespace dev_repmove_autotest.Factories
             {
                 args.Add("--start-maximized");
                 args.Add("--window-position=0,0");
-            }
+            }*/
 
             var launchOptions = new BrowserTypeLaunchOptions
             {
                 Headless = headless,
-                Args = args.ToArray()
             };
 
             var browser = browserType switch
