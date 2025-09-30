@@ -1,57 +1,122 @@
-# dev-repmove-autotest
-INSTALL SDK IF MISSING
-- **Windows**: Download and install from [.NET Download](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
-- **Linux (Ubuntu)**:
 
+### **INSTALL SDK IF MISSING**
+
+  - **Windows**: Download and install from [.NET Download](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+  - **Linux (Ubuntu)**:
+
+<!-- end list -->
+
+```bash
 wget https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh -O dotnet-install.sh
 chmod +x dotnet-install.sh
 ./dotnet-install.sh --version 8.0.100
-INSTALL ALLURE IF MISSING
+```
+
+### **INSTALL ALLURE IF MISSING**
+
+**Windows (using Scoop or Chocolatey):**
+
+```bash
 scoop install allure
 # or
 choco install allure
+```
 
+**Linux (Ubuntu):**
+
+```bash
 sudo apt-add-repository ppa:qameta/allure
 sudo apt-get update
 sudo apt-get install allure
+```
 
-# 1. Перевірити .NET
-dotnet --version  # Має бути >= 8.0
+-----
 
-# 2. Перевірити Git
+### **Setup and Execution**
+
+**1. Check .NET version**
+
+```bash
+dotnet --version # Should be >= 8.0
+```
+
+**2. Check Git version**
+
+```bash
 git --version
+```
 
-# 3. Клонувати проект
+**3. Clone the project**
+
+```bash
 git clone <repo-url>
 cd dev-repmove-autotest
+```
 
-# 4. Встановити пакети
+**4. Install packages**
+
+```bash
 dotnet restore
+```
 
-# 5. Збілдити
+**5. Build the project**
+
+```bash
 dotnet build
+```
 
-# 6. Встановити браузери
+**6. Install browsers**
+
+```bash
 pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps
+```
 
-# 7. Перевірити Allure (опціонально)
+**7. Check Allure (optional)**
+
+```bash
 allure --version
+```
 
-# 8. Запустити тести
+**8. Run tests**
+
+```bash
 dotnet test --configuration Debug
+```
 
-# 2. Згенерувати звіт
+-----
+
+### **Reporting**
+
+**1. Generate the report**
+
+```bash
 allure generate --clean "bin\Debug\net8.0\allure-results" -o "bin\Debug\net8.0\allure-report"
+```
 
-# 3. Відкрити звіт
+**2. Open the report**
+
+```bash
 allure open "bin\Debug\net8.0\allure-report"
+```
 
+-----
 
-# Тільки Chromium (Chrome/Edge)
+### **Running Tests for Specific Browsers**
+
+**Only Chromium (Chrome/Edge)**
+
+```bash
 dotnet test --filter "FullyQualifiedName~Chromium"
+```
 
-# Тільки Firefox
+**Only Firefox**
+
+```bash
 dotnet test --filter "FullyQualifiedName~Firefox"
+```
 
-# Тільки WebKit (Safari)
+**Only WebKit (Safari)**
+
+```bash
 dotnet test --filter "FullyQualifiedName~WebKit"
+```
