@@ -1,5 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<ItemGroup>
+		<EmbeddedResource Remove="**/*.resx" />
+		<Compile Remove="**/*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="*.cs" />
+		<Compile Include="**/*.cs" Exclude="bin/**;obj/**" />
+	</ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>dev_repmove_autotest</RootNamespace>
@@ -38,9 +47,6 @@
     <Folder Include="Tests\SmokeTests\" />
     <Folder Include="Tests\SanityTests\" />
   </ItemGroup>
-	<ItemGroup>
-		<!-- Вимикаємо пошук resx -->
-		<EmbeddedResource Remove="**/*.resx" />
-	</ItemGroup>
+
 
 </Project>
