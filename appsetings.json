@@ -1,0 +1,10 @@
+{
+  "BaseUrl": "https://dev-repmove-enterprise.web",
+  "User": {
+    "Email": "auto+test@gmail.com",
+    "MainPassword": "Autotestpass1!",
+    "Phone": "+380931111111",
+    "CompanyName": "DevRepEnterprise",
+    "Industry": "Other Industry"
+  }
+}
