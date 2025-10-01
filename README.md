@@ -1,97 +1,132 @@
 
-### **INSTALL SDK IF MISSING**
-Recomended os: Windows 10/11 
-  - **Windows**: Download and install from [.NET Download](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-  - **Linux (Ubuntu)**:   
-	- sudo apt update
-	- sudo apt install dotnet8
- 
+# ?? Dev Repmove Autotest
 
-### **INSTALL ALLURE IF MISSING**
-	https://allurereport.org/docs/install/
+Automated UI tests powered by **.NET 8**, **Playwright**, and **Allure Reports**.  
+This project ensures reliable end-to-end testing across **Chromium, Firefox, and WebKit** browsers.
+
+---
+
+## ?? Prerequisites
+
+### 1. Install .NET SDK (>= 8.0)
+- **Windows:** [Download here](https://dotnet.microsoft.com/en-us/download)
+- **Linux (Ubuntu):**
+
+  sudo apt update
+  sudo apt install dotnet8
+
+* **macOS:**
+
+  brew install --cask dotnet
 
 
-### **Setup and Execution**
+### 2. Install Allure
 
-**1. Check .NET version**
+Follow the [Allure Installation Guide](https://allurereport.org/docs/install/).
 
-dotnet --version # Should be >= 8.0
-
-
-**2. Check Git version**
+### 3. Install Git
 
 git --version
 
 
-**3. Clone the project**
+## ?? Setup and Execution
+
+### 1. Clone the Project
 
 
 git clone <repo-url>
 cd dev-repmove-autotest
 
 
-**4. Install packages**
-
+### 2. Restore Packages
 
 dotnet restore
 
-
-**5. Build the project**
-
+### 3. Build the Project
 
 dotnet build
 
+### 4. Install Playwright Browsers
 
-**6. Install browsers**
+Recommended (cross-platform):
 
-
-pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps
-
-
-**7. Check Allure (optional)**
-
-
-allure --version
+dotnet new tool-manifest
+dotnet tool install Microsoft.Playwright.CLI
+dotnet tool run playwright install --with-deps
 
 
-**8. Run tests**
+?? **Windows alternative:**
 
+pwsh bin\Debug\net8.0\playwright.ps1 install --with-deps
+
+
+? **Path notes:**
+
+* Windows ? use backslashes 
+* Linux/macOS ? use forward slashes 
+
+### 5. Run Tests
 
 dotnet test --configuration Debug
 
 
------
+## ?? Reporting with Allure
 
-### **Reporting**
+### Generate the Report
 
-**1. Generate the report**
+* **Windows:**
 
 
 allure generate --clean "bin\Debug\net8.0\allure-results" -o "bin\Debug\net8.0\allure-report"
 
 
-**2. Open the report**
+* **Linux/macOS:**
 
+
+allure generate --clean bin/Debug/net8.0/allure-results -o bin/Debug/net8.0/allure-report
+
+
+### Open the Report
+
+* **Windows:**
 
 allure open "bin\Debug\net8.0\allure-report"
 
+* **Linux/macOS:**
 
 
-### **Running Tests for Specific Browsers**
+allure open bin/Debug/net8.0/allure-report
 
-**Only Chromium (Chrome/Edge)**
+## ?? Running Tests for Specific Browsers
+
+? **Chromium (Chrome/Edge)**
+
 
 dotnet test --filter "FullyQualifiedName~Chromium"
 
 
-
-**Only Firefox**
-
+? **Firefox**
 
 dotnet test --filter "FullyQualifiedName~Firefox"
 
 
-**Only WebKit (Safari)**
+? **WebKit (Safari)**
 
 
 dotnet test --filter "FullyQualifiedName~WebKit"
+
+
+## ?? Tips
+
+* Always run `dotnet build` before running tests.
+* Use `--filter` to speed up debugging by targeting specific test suites.
+* Allure reports are best viewed in Chrome/Edge.
+
+---
+
+## ?? Tech Stack
+
+* **.NET 8** – Test framework
+* **NUnit** – Unit testing framework
+* **Playwright** – Cross-browser automation
+* **Allure** – Reporting

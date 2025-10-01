@@ -4,9 +4,10 @@ namespace dev_repmove_autotest.Utils.Enum
 {
     public enum EIndustry
     {
-        [Display(Name = "Manufacturer")]
-        Manufacturer,
-        [Display(Name = "Medical")]
-        Medical
+        [Display(Name = "Equipment Rental")]
+        EquipmentRental,
+        [Display(Name = "Rep Agency")]
+        RepAgency
+        // Add more industries as needed
     }
 }

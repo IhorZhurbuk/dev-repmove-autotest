@@ -1,63 +1,159 @@
-﻿namespace dev_repmove_autotest.Utils.Helper
+﻿using dev_repmove_autotest.Utils.Enum;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace dev_repmove_autotest.Utils.Helper
 {
-    public class Generator
+    public static class Generator
     {
-        private static readonly Random random = new Random();
-        public static string GenerateRandomNumbers(int lenght)
+        private const string Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private const string Lower = "abcdefghijklmnopqrstuvwxyz";
+        private const string Digits = "0123456789";
+        private const string Special = "!@#$%^&*";
+        private static readonly string AllChars = Upper + Lower + Digits + Special;
+
+        private static readonly string[] EmailDomains = { "gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "ukr.net" };
+
+        private static readonly string[] UkraineMobileCodes =
+            { "50","63","66","67","68","73","91","92","93","94","95","96","97","98","99" };
+
+        private static int GetRandomInt(int maxExclusive) => RandomNumberGenerator.GetInt32(maxExclusive);
+        private static int GetRandomInt(int minInclusive, int maxExclusive) => RandomNumberGenerator.GetInt32(minInclusive, maxExclusive);
+
+        private static char GetRandomCharFrom(string source)
         {
-            var numbers = new int[lenght];
-
-            for (int i = 0; i < numbers.Length; i++)
-            {
-                numbers[i] = random.Next(0, 10);
-            }
-
-            return string.Join("", numbers);
+            return source[GetRandomInt(source.Length)];
         }
+
+        private static string GetRandomDigits(int count)
+        {
+            var sb = new StringBuilder(count);
+            for (int i = 0; i < count; i++)
+                sb.Append((char)('0' + GetRandomInt(10)));
+            return sb.ToString();
+        }
+
+        private static void ShuffleInPlace<T>(IList<T> list)
+        {
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = GetRandomInt(i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+        }
+
+
+        public static string GenerateRandomString(int length)
+        {
+            if (length <= 0) throw new ArgumentException("Length must be positive", nameof(length));
+            const string chars = Upper + Lower;
+            var sb = new StringBuilder(length);
+            for (int i = 0; i < length; i++)
+                sb.Append(GetRandomCharFrom(chars));
+            return sb.ToString();
+        }
+
         public static string GenerateRandomPassword(int length)
         {
-            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const string lower = "abcdefghijklmnopqrstuvwxyz";
-            const string digits = "0123456789";
-            const string special = "!@#$%^&*";
-            const string all = upper + lower + digits + special;
-
             if (length < 4)
-                throw new ArgumentException("Password length must be at least 4 to include all required character types.");
+                throw new ArgumentException("Password length must be at least 4 to include all required character types.", nameof(length));
 
-            var random = new Random();
-            var passwordChars = new List<char>
+            var chars = new List<char>
             {
-                upper[random.Next(upper.Length)],
-                lower[random.Next(lower.Length)],
-                digits[random.Next(digits.Length)],
-                special[random.Next(special.Length)]
+                GetRandomCharFrom(Upper),
+                GetRandomCharFrom(Lower),
+                GetRandomCharFrom(Digits),
+                GetRandomCharFrom(Special)
             };
 
             for (int i = 4; i < length; i++)
-            {
-                passwordChars.Add(all[random.Next(all.Length)]);
-            }
+                chars.Add(GetRandomCharFrom(AllChars));
 
-            return new string(passwordChars.OrderBy(x => random.Next()).ToArray());
+            ShuffleInPlace(chars);
+            return new string(chars.ToArray());
         }
 
 
         public static string GenerateRandomEmail()
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            const string domains = "gmail.com,yahoo.com,outlook.com,hotmail.com,ukr.net";
-            var domainArray = domains.Split(',');
+            var usernameLength = GetRandomInt(5, 11); 
+            var sb = new StringBuilder(usernameLength);
+            const string usernameChars = Lower + Digits;
 
-            var usernameLength = random.Next(5, 11);
-            var username = new char[usernameLength];
-            for (int i = 0; i < usernameLength; i++)
+            sb.Append(GetRandomCharFrom(usernameChars));
+            for (int i = 1; i < usernameLength - 1; i++)
+                sb.Append(GetRandomCharFrom(usernameChars));
+            if (usernameLength > 1)
+                sb.Append(GetRandomCharFrom(usernameChars));
+
+            var domain = EmailDomains[GetRandomInt(EmailDomains.Length)];
+            return $"{sb}@{domain}";
+        }
+
+        public static string GenerateValidPhoneNumber(ECountryCode countryCode, bool includeCountryPrefix = false)
+        {
+            string national = countryCode switch
             {
-                username[i] = chars[random.Next(chars.Length)];
-            }
-            var domain = domainArray[random.Next(domainArray.Length)];
+                ECountryCode.GreatBritan => GenerateUKDomesticNumber(), 
+                ECountryCode.Usa => GenerateUSADomesticNumber(),       
+                ECountryCode.Canada => GenerateCanadaDomesticNumber(), 
+                ECountryCode.Ukraine => GenerateUkraineDomesticNumber(),
+                _ => GetRandomDigits(10)
+            };
 
-            return $"{new string(username)}@{domain}";
+            if (!includeCountryPrefix) return national;
+
+            return countryCode switch
+            {
+                ECountryCode.GreatBritan => $"+44{national.Substring(1)}", 
+                ECountryCode.Usa => $"+1{national}",
+                ECountryCode.Canada => $"+1{national}",
+                ECountryCode.Ukraine => $"+380{national}",
+                _ => national
+            };
+        }
+        private static string GenerateUkraineDomesticNumber()
+        {
+            var code = UkraineMobileCodes[GetRandomInt(UkraineMobileCodes.Length)];
+            var subscriber = GetRandomDigits(7);
+            return $"{code}{subscriber}";
+        }
+
+        private static string GenerateUKDomesticNumber()
+        {
+            var after7 = GetRandomDigits(9); 
+            return $"07{after7}";
+        }
+
+
+        private static string GenerateUSADomesticNumber()
+        {
+            var usaAreaCodes = new[] { "212", "213", "214", "305", "312", "404", "415", "512", "602", "702", "718", "818", "917" };
+            var area = usaAreaCodes[GetRandomInt(usaAreaCodes.Length)];
+
+            int centralFirst = GetRandomInt(8) + 2;
+            int centralSecond = GetRandomInt(10);
+            int centralThird = GetRandomInt(10);
+            var central = $"{centralFirst}{centralSecond}{centralThird}";
+
+            var subscriber = GetRandomDigits(4);
+
+            return $"{area}{central}{subscriber}";
+        }
+
+        private static string GenerateCanadaDomesticNumber()
+        {
+            var canadaAreaCodes = new[] { "506", "514", "519", "548", "579", "581", "587" };
+            var area = canadaAreaCodes[GetRandomInt(canadaAreaCodes.Length)];
+            
+            int centralFirst = GetRandomInt(8) + 2;
+            int centralSecond = GetRandomInt(10);
+            int centralThird = GetRandomInt(10);
+            var central = $"{centralFirst}{centralSecond}{centralThird}";
+
+            var subscriber = GetRandomDigits(4);
+
+            return $"{area}{central}{subscriber}";
         }
     }
 }

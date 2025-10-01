@@ -12,40 +12,44 @@ namespace dev_repmove_autotest.Pages
         {
             this.page = page;
         }
-        protected async Task SelectComboBoxOptionAsync(ILocator comboBox, string optionText, int timeout = 5000)
+        protected async Task SelectComboBoxOptionAsync(ILocator comboBox, string optionText, string? alternativeText = null, bool useClassSelector = false, int timeout = 5000)
         {
             try
             {
                 await comboBox.WaitForAsync(new LocatorWaitForOptions
                 {
-                    State = WaitForSelectorState.Attached,
+                    State = WaitForSelectorState.Visible,
                     Timeout = timeout
                 });
 
                 await comboBox.ClickAsync();
 
-                await page.WaitForTimeoutAsync(1000);
+                ILocator option;
 
-                var option = page.GetByRole(AriaRole.Option, new() { Name = optionText, Exact = true });
-                if (await option.CountAsync() == 0)
+                if (useClassSelector && !string.IsNullOrEmpty(alternativeText))
                 {
-
+                    option = page.Locator($"[role='option'] .fi.{alternativeText}");
+                }
+                else if (!string.IsNullOrEmpty(alternativeText))
+                {
+                    option = page.GetByRole(AriaRole.Option, new() { Name = alternativeText });
+                }
+                else
+                {
                     option = page.GetByRole(AriaRole.Option, new() { Name = optionText });
                 }
 
                 await option.WaitForAsync(new LocatorWaitForOptions
                 {
-                    State = WaitForSelectorState.Attached,
+                    State = WaitForSelectorState.Visible,
                     Timeout = timeout
                 });
 
-                await page.WaitForTimeoutAsync(500);
-
-                await option.ClickAsync(new LocatorClickOptions { Force = true });
+                await option.ClickAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to select option '{optionText}' in combobox: {ex.Message}", ex);
+                throw new InvalidOperationException($"Failed to select option '{optionText}' in combobox: {ex.Message}", ex);
             }
         }
         protected T GetRandomEnum<T>() where T : struct, System.Enum
@@ -60,6 +64,12 @@ namespace dev_repmove_autotest.Pages
             var attribute = field?.GetCustomAttribute<DisplayAttribute>();
             return attribute?.Name ?? value.ToString();
         }
-    }
 
+        protected string GetDisplayDescription(System.Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = field?.GetCustomAttribute<DisplayAttribute>();
+            return attribute?.Description ?? string.Empty;
+        }
+    }
 }

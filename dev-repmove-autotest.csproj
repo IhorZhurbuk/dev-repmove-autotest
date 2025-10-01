@@ -34,9 +34,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Tests\SmokeTests\" />
-    <Folder Include="Tests\SanityTests\" />
-  </ItemGroup>
-
 </Project>

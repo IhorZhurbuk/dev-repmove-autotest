@@ -11,24 +11,26 @@ namespace dev_repmove_autotest.Tests
     [AllureNUnit]
     public abstract class BaseTest
     {
-        private  IPlaywright? _playwright;
+        private IPlaywright? _playwright;
+        private string _baseUrl = string.Empty;
+
         protected IBrowser? Browser;
         protected IBrowserContext? Context;
         protected IPage? Page;
         protected EBrowserType CurrentBrowserType;
-        private string baseUrl;
+        protected UserConfig User;
 
         protected BaseTest(EBrowserType browserType)
         {
             CurrentBrowserType = browserType;
-
+            User = ConfigurationManager.Instance.User;
         }
 
         [OneTimeSetUp]
         public async Task GlobalSetup()
         {
             _playwright = await Playwright.CreateAsync();
-             baseUrl = ConfigurationManager.Instance.BaseUrl;
+            _baseUrl = ConfigurationManager.Instance.BaseUrl;
         }
 
         [OneTimeTearDown]
@@ -57,7 +59,7 @@ namespace dev_repmove_autotest.Tests
                 }
             });
 
-            await Page.GotoAsync(baseUrl);
+            await Page.GotoAsync(_baseUrl);
         }
 
         [TearDown]
